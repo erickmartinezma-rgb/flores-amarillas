@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Para ti 💛</title>
+
+<style>
+body {
+  margin: 0;
+  background: black;
+  overflow: hidden;
+  font-family: 'Segoe UI';
+  color: white;
+}
+
+/* Fade inicial */
+.fade {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: black;
+  z-index: 10;
+  animation: fadeOut 3s forwards;
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; visibility: hidden; }
+}
+
+/* Texto */
+.texto {
+  position: absolute;
+  top: 60px;
+  left: 40px;
+  opacity: 0;
+  animation: aparecer 3s 2s forwards;
+}
+
+@keyframes aparecer {
+  to { opacity: 1; }
+}
+
+/* Tronco */
+.tronco {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 40px;
+  height: 250px;
+  background: #8b5a2b;
+  transform: translateX(-50%);
+}
+
+/* Botón */
+.btn {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 25px;
+  background: #25D366;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  opacity: 0;
+  animation: aparecer 3s 3s forwards;
+}
+
+/* Carta */
+.carta {
+  position: fixed;
+  bottom: -100%;
+  width: 100%;
+  height: 100%;
+  background: white;
+  color: black;
+  padding: 40px;
+  transition: 1s;
+}
+
+.carta.active {
+  bottom: 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="fade"></div>
+
+<div class="texto">
+  <h2>Flores Amarillas para ti 💛</h2>
+  <p>Si pudiera elegir... te elegiría siempre ✨</p>
+</div>
+
+<div class="tronco"></div>
+
+<button class="btn" onclick="abrirCarta()">Abrir 💌</button>
+
+<div class="carta" id="carta">
+  <h2>Para ti 💛</h2>
+  <p>
+    Desde que llegaste a mi vida todo cambió...<br><br>
+    Eres mi lugar favorito 🌼<br><br>
+    Te amo muchísimo 💛
+  </p>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let flores = [];
+let caidas = [];
+
+// 🌻 flor con pétalos
+function drawFlower(x, y, size) {
+  for (let i = 0; i < 10; i++) {
+    let angle = (Math.PI * 2 / 10) * i;
+    ctx.fillStyle = "#FFD700";
+    ctx.beginPath();
+    ctx.arc(x + Math.cos(angle)*size, y + Math.sin(angle)*size, size/2, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  ctx.fillStyle = "#5a3d00";
+  ctx.beginPath();
+  ctx.arc(x, y, size/2, 0, Math.PI*2);
+  ctx.fill();
+}
+
+// 🌳 generar árbol progresivo
+let i = 0;
+let total = 2500;
+
+function generar() {
+  if (i >= total) return;
+
+  let t = i / total * Math.PI * 2;
+
+  let x = 16 * Math.pow(Math.sin(t), 3);
+  let y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+
+  flores.push({
+    x: canvas.width/2 + x * 12,
+    y: 300 + y * 12,
+    size: Math.random()*4 + 2
+  });
+
+  i++;
+  requestAnimationFrame(generar);
+}
+
+generar();
+
+// 🎬 animación
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  flores.forEach(f => {
+    drawFlower(f.x, f.y, f.size);
+  });
+
+  // caída
+  if (Math.random() < 0.2) {
+    caidas.push({
+      x: canvas.width/2 + (Math.random()*200-100),
+      y: 250,
+      size: Math.random()*4 + 2
+    });
+  }
+
+  caidas.forEach((f, i) => {
+    f.y += 2;
+    drawFlower(f.x, f.y, f.size);
+
+    if (f.y > canvas.height) caidas.splice(i, 1);
+  });
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+
+// 💌 carta
+function abrirCarta() {
+  document.getElementById("carta").classList.add("active");
+}
+</script>
+
+</body>
+</html>
